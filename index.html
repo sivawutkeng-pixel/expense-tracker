@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#7a5a28" />
+  <meta name="description" content="บันทึกค่าใช้จ่าย แยกส่วนตัวและสปอนเซอร์ รองรับหลายสกุลเงินและรูปใบเสร็จ" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>บันทึกค่าใช้จ่าย</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>บันทึกค่าใช้จ่าย</h1>
+    <div class="sub">แยกส่วนตัวและสปอนเซอร์ พร้อมเก็บรูปใบเสร็จ</div>
+
+    <section class="summary">
+      <div class="box"><small>รวมทั้งหมด</small><b id="sumAll">฿0.00</b></div>
+      <div class="box"><small>ส่วนตัว</small><b id="sumPersonal">฿0.00</b></div>
+      <div class="box"><small>สปอนเซอร์</small><b id="sumSponsor">฿0.00</b></div>
+    </section>
+
+    <section class="card">
+      <div class="seg">
+        <button type="button" id="btnPersonal" class="active">ส่วนตัว</button>
+        <button type="button" id="btnSponsor">สปอนเซอร์</button>
+      </div>
+
+      <label for="currency">สกุลเงิน</label>
+      <select id="currency">
+        <option value="THB">บาทไทย (THB)</option>
+        <option value="CNY">หยวนจีน (CNY)</option>
+        <option value="HKD">ดอลลาร์ฮ่องกง (HKD)</option>
+      </select>
+
+      <label for="amount">จำนวนเงิน</label>
+      <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
+
+      <div id="rateBox">
+        <label for="rate">อัตราแลกเปลี่ยนเป็นเงินบาท</label>
+        <input id="rate" type="number" inputmode="decimal" min="0" step="0.0001" value="1" />
+        <div class="meta" id="rateHint">1 THB = 1.0000 บาท</div>
+      </div>
+
+      <div class="box" style="margin-top:12px">
+        <small>คิดเป็นเงินบาท</small>
+        <b id="convertedAmount">฿0.00</b>
+      </div>
+
+      <label for="note">รายการ / หมายเหตุ</label>
+      <textarea id="note" placeholder="เช่น ค่าอาหาร ค่าเดินทาง"></textarea>
+
+      <label for="receipt">รูปใบเสร็จ</label>
+      <input id="receipt" type="file" accept="image/*" capture="environment" />
+
+      <button class="primary" id="saveBtn">บันทึกรายการ</button>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <h2 style="font-size:1.1rem;margin:0">รายการล่าสุด</h2>
+        <button id="exportBtn" style="width:auto;border:1px solid var(--gold2);background:white;border-radius:12px;padding:8px 10px">ส่งออก CSV</button>
+      </div>
+      <div class="filter" style="margin-top:12px">
+        <select id="filterType">
+          <option value="all">ทุกหมวด</option>
+          <option value="personal">ส่วนตัว</option>
+          <option value="sponsor">สปอนเซอร์</option>
+        </select>
+        <input id="filterMonth" type="month" />
+      </div>
+      <div id="list"></div>
+    </section>
+  </div>
+
+  <div class="footer"><div class="inner">ข้อมูลเก็บอยู่ในเครื่องนี้ กรุณาส่งออก CSV เป็นระยะ</div></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
