@@ -1,4 +1,28 @@
 const $ = id => document.getElementById(id);
+
+function parseDecimal(value){
+  const cleaned=String(value ?? '')
+    .trim()
+    .replace(/\s/g,'')
+    .replace(/,/g,'.')
+    .replace(/[^0-9.]/g,'');
+
+  const firstDot=cleaned.indexOf('.');
+  const normalized=firstDot<0
+    ? cleaned
+    : cleaned.slice(0,firstDot+1)+cleaned.slice(firstDot+1).replace(/\./g,'');
+
+  const number=parseFloat(normalized);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function normalizeDecimalInput(input, decimals){
+  const n=parseDecimal(input.value);
+  if(!n && n!==0) return;
+  if(input.value.trim()==='') return;
+  input.value=String(n.toFixed(decimals)).replace(/\.?0+$/,'');
+}
+
 let currentType = 'personal';
 let items = JSON.parse(localStorage.getItem('expenseItemsV1') || '[]');
 
@@ -30,9 +54,10 @@ function compressImage(file){
 
 function updateConversion(){
   const currency=$('currency').value;
-  const amount=parseFloat($('amount').value)||0;
-  const rate=currency==='THB' ? 1 : (parseFloat($('rate').value)||0);
+  const amount=parseDecimal($('amount').value);
+  const rate=currency==='THB' ? 1 : (parseDecimal($('rate').value));
   $('rate').disabled = currency==='THB';
+  $('updateRateBtn').disabled = currency==='THB';
   $('rate').value = currency==='THB' ? 1 : $('rate').value;
   $('rateHint').textContent = `1 ${currency} = ${rate.toFixed(4)} บาท`;
   $('convertedAmount').textContent = money(amount*rate);
@@ -44,13 +69,50 @@ $('currency').onchange=()=>{
   $('rate').value = c==='THB' ? 1 : (savedRates[c] || '');
   updateConversion();
 };
+$('updateRateBtn').onclick=async()=>{
+  const currency=$('currency').value;
+  if(currency==='THB'){
+    alert('เงินบาทใช้อัตรา 1 อยู่แล้ว');
+    return;
+  }
+
+  const btn=$('updateRateBtn');
+  btn.disabled=true;
+  btn.textContent='กำลังอัปเดต...';
+
+  try{
+    const response=await fetch(`https://api.frankfurter.dev/v1/latest?base=${currency}&symbols=THB`);
+    if(!response.ok) throw new Error();
+
+    const data=await response.json();
+    const latestRate=Number(data?.rates?.THB);
+    if(!latestRate) throw new Error();
+
+    $('rate').value=latestRate.toFixed(4);
+
+    const savedRates=JSON.parse(localStorage.getItem('expenseRatesV1')||'{}');
+    savedRates[currency]=latestRate;
+    localStorage.setItem('expenseRatesV1',JSON.stringify(savedRates));
+
+    updateConversion();
+    $('rateHint').textContent=`1 ${currency} = ${latestRate.toFixed(4)} บาท · อัปเดต ${data.date}`;
+  }catch{
+    alert('อัปเดตไม่ได้ กรุณากรอกอัตราเอง');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='อัปเดตอัตราวันนี้';
+  }
+};
+
 $('amount').oninput=updateConversion;
 $('rate').oninput=updateConversion;
+$('amount').onblur=()=>{ normalizeDecimalInput($('amount'),2); updateConversion(); };
+$('rate').onblur=()=>{ normalizeDecimalInput($('rate'),4); updateConversion(); };
 
 $('saveBtn').onclick=async()=>{
-  const amount=parseFloat($('amount').value);
+  const amount=parseDecimal($('amount').value);
   const currency=$('currency').value;
-  const rate=currency==='THB' ? 1 : parseFloat($('rate').value);
+  const rate=currency==='THB' ? 1 : parseDecimal($('rate').value);
   if(!amount || amount<=0){ alert('กรุณาระบุจำนวนเงิน'); return; }
   if(!rate || rate<=0){ alert('กรุณาระบุอัตราแลกเปลี่ยน'); return; }
 

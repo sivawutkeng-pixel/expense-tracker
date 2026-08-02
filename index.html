@@ -36,11 +36,12 @@
       </select>
 
       <label for="amount">จำนวนเงิน</label>
-      <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" />
+      <input id="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="เช่น 100 หรือ 100.50" />
 
       <div id="rateBox">
         <label for="rate">อัตราแลกเปลี่ยนเป็นเงินบาท</label>
-        <input id="rate" type="number" inputmode="decimal" min="0" step="0.0001" value="1" />
+        <input id="rate" type="text" inputmode="decimal" autocomplete="off" value="1" placeholder="เช่น 4.5375" />
+        <button type="button" id="updateRateBtn" class="rate-update">อัปเดตอัตราวันนี้</button>
         <div class="meta" id="rateHint">1 THB = 1.0000 บาท</div>
       </div>
 

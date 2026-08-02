@@ -1,4 +1,4 @@
-const CACHE_NAME = 'expense-currency-pwa-v1';
+const CACHE_NAME = 'expense-currency-pwa-v3';
 const APP_SHELL = [
   './',
   './index.html',

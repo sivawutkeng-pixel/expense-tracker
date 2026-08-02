@@ -37,3 +37,17 @@
       .thumb{width:64px;height:64px}
       .amt{grid-column:2}
     }
+.rate-update{
+  margin-top:8px;
+  border:1px solid var(--gold2);
+  background:#fffaf0;
+  color:var(--text);
+  border-radius:12px;
+  padding:10px 12px;
+  font-weight:700;
+}
+.rate-update:disabled{opacity:.55}
+
+#amount, #rate{
+  font-variant-numeric: tabular-nums;
+}
